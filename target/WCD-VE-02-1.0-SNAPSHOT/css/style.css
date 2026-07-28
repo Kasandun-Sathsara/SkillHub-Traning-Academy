@@ -1,0 +1,19 @@
+/* Basic Styles for Student Project */
+
+body { 
+    background-color: #f8f9fa; /* Light gray background */
+}
+
+/* Navbar customization */
+.navbar-brand { 
+    font-size: 2.0rem; 
+}
+
+.nav-link { 
+    font-size: 1.3rem; 
+}
+
+/* Adding a bit of margin to the main container */
+.container {
+    margin-top: 20px;
+}

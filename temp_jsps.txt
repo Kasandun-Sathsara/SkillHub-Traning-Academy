@@ -1,0 +1,697 @@
+﻿==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\attendance.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="lk.jiat.wcdve02.model.Attendance"%>
+<%@page import="lk.jiat.wcdve02.model.Enrollment"%>
+<jsp:include page="/WEB-INF/components/header.jsp"/>
+
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+    <h2 class="fw-bold mb-0">Attendance Tracking</h2>
+    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#markAttendanceModal">Mark Attendance</button>
+</div>
+
+<div class="card mb-5">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    List<Attendance> attendances = (List<Attendance>) request.getAttribute("attendances");
+                    if (attendances != null && !attendances.isEmpty()) {
+                        for (Attendance a : attendances) {
+                %>
+                    <tr>
+                        <td class="align-middle"><%= a.getId() %></td>
+                        <td class="align-middle"><%= a.getDate() %></td>
+                        <td class="align-middle fw-semibold"><%= a.getStudentName() != null ? a.getStudentName() : "Unknown" %></td>
+                        <td class="align-middle text-muted"><%= a.getCourseTitle() != null ? a.getCourseTitle() : "Unknown" %></td>
+                        <td class="align-middle">
+                            <% if(a.isPresent()) { %>
+                                <span class="badge bg-success">Present</span>
+                            <% } else { %>
+                                <span class="badge bg-danger">Absent</span>
+                            <% } %>
+                        </td>
+                        <td class="text-end align-middle">
+                            <a href="${pageContext.request.contextPath}/attendance?action=delete&id=<%= a.getId() %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this record?')">Delete</a>
+                        </td>
+                    </tr>
+                <%
+                        }
+                    } else {
+                %>
+                    <tr><td colspan="6" class="text-center py-5 text-muted">No attendance records found.</td></tr>
+                <%
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="markAttendanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Mark Attendance</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="${pageContext.request.contextPath}/attendance" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="add">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">SELECT ENROLLMENT</label>
+                        <select name="enrollmentId" class="form-select" required>
+                            <% 
+                                List<Enrollment> enrollments = (List<Enrollment>) request.getAttribute("enrollments");
+                                if(enrollments != null) {
+                                    for(Enrollment e : enrollments) {
+                            %>
+                                <option value="<%= e.getId() %>"><%= e.getStudentName() %> - <%= e.getCourseTitle() %></option>
+                            <% 
+                                    }
+                                }
+                            %>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-bold d-block">STATUS</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="present" id="presentYes" value="true" checked>
+                            <label class="form-check-label" for="presentYes">Present</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="present" id="presentNo" value="false">
+                            <label class="form-check-label" for="presentNo">Absent</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary w-100">Save Attendance</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/WEB-INF/components/footer.jsp"/>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\courses.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="lk.jiat.wcdve02.model.Course"%>
+<jsp:include page="/WEB-INF/components/header.jsp"/>
+
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+    <h2 class="fw-bold mb-0">Course Management</h2>
+    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addCourseModal">Add Course</button>
+</div>
+
+<div class="card mb-5">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Duration (Days)</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    List<Course> courses = (List<Course>) request.getAttribute("courses");
+                    if (courses != null && !courses.isEmpty()) {
+                        for (Course c : courses) {
+                %>
+                    <tr>
+                        <td class="align-middle"><%= c.getId() %></td>
+                        <td class="align-middle fw-semibold"><%= c.getTitle() %></td>
+                        <td class="align-middle text-muted"><%= c.getDescription() %></td>
+                        <td class="align-middle"><%= c.getDurationDays() %></td>
+                        <td class="text-end align-middle">
+                            <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#editCourseModal<%= c.getId() %>">Edit</button>
+                            <a href="${pageContext.request.contextPath}/courses?action=delete&id=<%= c.getId() %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                    
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editCourseModal<%= c.getId() %>" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content text-start">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title fw-bold">Edit Course</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="${pageContext.request.contextPath}/courses" method="post">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="action" value="edit">
+                                        <input type="hidden" name="id" value="<%= c.getId() %>">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">TITLE</label>
+                                            <input type="text" name="title" class="form-control" value="<%= c.getTitle() %>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">DESCRIPTION</label>
+                                            <textarea name="description" class="form-control" rows="3" required><%= c.getDescription() %></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">DURATION (DAYS)</label>
+                                            <input type="number" name="durationDays" class="form-control" value="<%= c.getDurationDays() %>" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <%
+                        }
+                    } else {
+                %>
+                    <tr><td colspan="5" class="text-center py-5 text-muted">No courses found.</td></tr>
+                <%
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addCourseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Add New Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="${pageContext.request.contextPath}/courses" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="add">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">TITLE</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">DESCRIPTION</label>
+                        <textarea name="description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">DURATION (DAYS)</label>
+                        <input type="number" name="durationDays" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary w-100">Add Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/WEB-INF/components/footer.jsp"/>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\dashboard.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:include page="/WEB-INF/components/header.jsp"/>
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-2 flex-wrap">
+    <h2 class="fw-bold text-dark mb-2 mb-md-0">Dashboard Overview</h2>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card text-center p-4 h-100" style="border-bottom: 5px solid #0d6efd !important;">
+            <div class="mb-3 text-primary"></div>
+            <h1 class="display-4 fw-bold text-dark">${studentCount}</h1>
+            <p class="text-muted mb-0 fw-bold small">TOTAL STUDENTS</p>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card text-center p-4 h-100" style="border-bottom: 5px solid #198754 !important;">
+            <div class="mb-3 text-success"></div>
+            <h1 class="display-4 fw-bold text-dark">${courseCount}</h1>
+            <p class="text-muted mb-0 fw-bold small">ACTIVE COURSES</p>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card text-center p-4 h-100" style="border-bottom: 5px solid #ffc107 !important;">
+            <div class="mb-3 text-warning"></div>
+            <h1 class="display-4 fw-bold text-dark">${trainerCount}</h1>
+            <p class="text-muted mb-0 fw-bold small">EXPERT TRAINERS</p>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card text-center p-4 h-100" style="border-bottom: 5px solid #0dcaf0 !important;">
+            <div class="mb-3 text-info"></div>
+            <h1 class="display-4 fw-bold text-dark">${enrollmentCount}</h1>
+            <p class="text-muted mb-0 fw-bold small">TOTAL ENROLLMENTS</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 mb-5">
+    <div class="col-12">
+        <div class="card p-4 p-md-5 text-center">
+            <h3 class="fw-bold mb-3 text-dark">Welcome to SkillHub Management Portal</h3>
+            <p class="text-muted fs-5 mb-0">Manage your academy seamlessly. Select a module from the navigation bar to get started.</p>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/WEB-INF/components/footer.jsp"/>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\enrollments.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="lk.jiat.wcdve02.model.Enrollment"%>
+<%@page import="lk.jiat.wcdve02.model.Student"%>
+<%@page import="lk.jiat.wcdve02.model.Course"%>
+<jsp:include page="/WEB-INF/components/header.jsp"/>
+
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+    <h2 class="fw-bold mb-0">Enrollment Management</h2>
+    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addEnrollmentModal">New Enrollment</button>
+</div>
+
+<div class="card mb-5">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Course Title</th>
+                    <th>Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    List<Enrollment> enrollments = (List<Enrollment>) request.getAttribute("enrollments");
+                    if (enrollments != null && !enrollments.isEmpty()) {
+                        for (Enrollment e : enrollments) {
+                %>
+                    <tr>
+                        <td class="align-middle"><%= e.getId() %></td>
+                        <td class="align-middle fw-semibold"><%= e.getStudentName() != null ? e.getStudentName() : "Unknown" %></td>
+                        <td class="align-middle text-muted"><%= e.getCourseTitle() != null ? e.getCourseTitle() : "Unknown" %></td>
+                        <td class="align-middle"><%= e.getEnrollmentDate() %></td>
+                        <td class="text-end align-middle">
+                            <a href="${pageContext.request.contextPath}/enrollments?action=delete&id=<%= e.getId() %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove enrollment?')">Delete</a>
+                        </td>
+                    </tr>
+                <%
+                        }
+                    } else {
+                %>
+                    <tr><td colspan="5" class="text-center py-5 text-muted">No enrollments found.</td></tr>
+                <%
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addEnrollmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">New Enrollment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="${pageContext.request.contextPath}/enrollments" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="add">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">SELECT STUDENT</label>
+                        <select name="studentId" class="form-select" required>
+                            <% 
+                                List<Student> students = (List<Student>) request.getAttribute("students");
+                                if(students != null) {
+                                    for(Student s : students) {
+                            %>
+                                <option value="<%= s.getId() %>"><%= s.getName() %> (<%= s.getEmail() %>)</option>
+                            <% 
+                                    }
+                                }
+                            %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">SELECT COURSE</label>
+                        <select name="courseId" class="form-select" required>
+                            <% 
+                                List<Course> courses = (List<Course>) request.getAttribute("courses");
+                                if(courses != null) {
+                                    for(Course c : courses) {
+                            %>
+                                <option value="<%= c.getId() %>"><%= c.getTitle() %></option>
+                            <% 
+                                    }
+                                }
+                            %>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary w-100">Enroll Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/WEB-INF/components/footer.jsp"/>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\index.jsp ====
+<%
+    response.sendRedirect(request.getContextPath() + "/login");
+%>
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\login.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:include page="/WEB-INF/components/header.jsp"/>
+
+<div class="row justify-content-center align-items-center px-3" style="min-height: 80vh;">
+    <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+        <div class="card p-4 p-md-5">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Welcome Back</h2>
+                <p class="text-muted">Sign in to your SkillHub account</p>
+            </div>
+            <% if (request.getAttribute("error") != null) { %>
+                <div class="alert alert-danger text-center"><%= request.getAttribute("error") %></div>
+            <% } %>
+            <form action="${pageContext.request.contextPath}/login" method="post">
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">USERNAME</label>
+                    <input type="text" name="username" class="form-control form-control-lg" required value="admin">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">PASSWORD</label>
+                    <input type="password" name="password" class="form-control form-control-lg" required value="admin123">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-100">Sign In</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/WEB-INF/components/footer.jsp"/>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\students.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="lk.jiat.wcdve02.model.Student"%>
+<jsp:include page="/WEB-INF/components/header.jsp"/>
+
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+    <h2 class="fw-bold mb-0">Student Management</h2>
+    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">Add Student</button>
+</div>
+
+<div class="card mb-5">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    List<Student> students = (List<Student>) request.getAttribute("students");
+                    if (students != null && !students.isEmpty()) {
+                        for (Student s : students) {
+                %>
+                    <tr>
+                        <td class="align-middle"><%= s.getId() %></td>
+                        <td class="align-middle fw-semibold"><%= s.getName() %></td>
+                        <td class="align-middle"><%= s.getEmail() %></td>
+                        <td class="align-middle"><%= s.getPhone() %></td>
+                        <td class="text-end align-middle">
+                            <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#editStudentModal<%= s.getId() %>">Edit</button>
+                            <a href="${pageContext.request.contextPath}/students?action=delete&id=<%= s.getId() %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this student?')">Delete</a>
+                        </td>
+                    </tr>
+                    
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editStudentModal<%= s.getId() %>" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content text-start">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title fw-bold">Edit Student</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="${pageContext.request.contextPath}/students" method="post">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="action" value="edit">
+                                        <input type="hidden" name="id" value="<%= s.getId() %>">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">NAME</label>
+                                            <input type="text" name="name" class="form-control" value="<%= s.getName() %>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">EMAIL</label>
+                                            <input type="email" name="email" class="form-control" value="<%= s.getEmail() %>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">PHONE</label>
+                                            <input type="text" name="phone" class="form-control" value="<%= s.getPhone() %>" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <%
+                        }
+                    } else {
+                %>
+                    <tr><td colspan="5" class="text-center py-5 text-muted">No students found.</td></tr>
+                <%
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Add New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="${pageContext.request.contextPath}/students" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="add">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">NAME</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">EMAIL</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">PHONE</label>
+                        <input type="text" name="phone" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary w-100">Add Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/WEB-INF/components/footer.jsp"/>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\trainers.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="lk.jiat.wcdve02.model.Trainer"%>
+<jsp:include page="/WEB-INF/components/header.jsp"/>
+
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+    <h2 class="fw-bold mb-0">Trainer Management</h2>
+    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addTrainerModal">Add Trainer</button>
+</div>
+
+<div class="card mb-5">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Expertise</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    List<Trainer> trainers = (List<Trainer>) request.getAttribute("trainers");
+                    if (trainers != null && !trainers.isEmpty()) {
+                        for (Trainer t : trainers) {
+                %>
+                    <tr>
+                        <td class="align-middle"><%= t.getId() %></td>
+                        <td class="align-middle fw-semibold"><%= t.getName() %></td>
+                        <td class="align-middle text-muted"><%= t.getExpertise() %></td>
+                        <td class="text-end align-middle">
+                            <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#editTrainerModal<%= t.getId() %>">Edit</button>
+                            <a href="${pageContext.request.contextPath}/trainers?action=delete&id=<%= t.getId() %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                    
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editTrainerModal<%= t.getId() %>" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content text-start">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title fw-bold">Edit Trainer</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="${pageContext.request.contextPath}/trainers" method="post">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="action" value="edit">
+                                        <input type="hidden" name="id" value="<%= t.getId() %>">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">NAME</label>
+                                            <input type="text" name="name" class="form-control" value="<%= t.getName() %>" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted small fw-bold">EXPERTISE</label>
+                                            <input type="text" name="expertise" class="form-control" value="<%= t.getExpertise() %>" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <%
+                        }
+                    } else {
+                %>
+                    <tr><td colspan="4" class="text-center py-5 text-muted">No trainers found.</td></tr>
+                <%
+                    }
+                %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addTrainerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Add New Trainer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="${pageContext.request.contextPath}/trainers" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="add">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">NAME</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">EXPERTISE</label>
+                        <input type="text" name="expertise" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary w-100">Add Trainer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/WEB-INF/components/footer.jsp"/>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\WEB-INF\components\footer.jsp ====
+</div> <!-- End of container from header -->
+<footer class="text-center mt-5 mb-3 text-muted">
+    <small>&copy; 2026 SkillHub Training Academy. All rights reserved.</small>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+==== E:\Java-Institute\WCD1\WCD-VE-02\src\main\webapp\WEB-INF\components\header.jsp ====
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillHub Academy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+</head>
+<body>
+<% 
+    if (session.getAttribute("user") != null) { 
+%>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 py-3">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="${pageContext.request.contextPath}/dashboard">SkillHub</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/students">Students</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/courses">Courses</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/trainers">Trainers</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/enrollments">Enrollments</a></li>
+                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/attendance">Attendance</a></li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link btn btn-danger px-4 py-2 text-white ms-2" href="${pageContext.request.contextPath}/logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<% 
+    } 
+%>
+<div class="container">
+
