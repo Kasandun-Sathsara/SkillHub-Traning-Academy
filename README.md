@@ -1,4 +1,4 @@
-# SkillHub Training Academy (WCD-VE-02)
+# SkillHub Training Academy 
 
 SkillHub is a simple, in-memory Java Jakarta EE Web Application for managing a training academy's operations. This project implements a Model-View-Controller (MVC) architecture using Servlets for controllers and JSP (JavaServer Pages) for views.
 
