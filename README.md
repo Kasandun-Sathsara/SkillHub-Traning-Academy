@@ -67,12 +67,12 @@ Skillhub_training_academy/
      ```
 
 3. **Deploy to Tomcat:**
-   - The build process will generate a `.war` file in the `target/` directory (e.g., `target/WCD-VE-02-1.0-SNAPSHOT.war`).
+   - The build process will generate a `.war` file in the `target/` directory (e.g., `target/SkillHub.war`).
    - Copy this `.war` file to your Tomcat `webapps/` directory.
    - Start your Tomcat server.
 
 4. **Access the application:**
-   - Open your browser and navigate to `http://localhost:8080/WCD-VE-02-1.0-SNAPSHOT` (or whichever context path you configured).
+   - Open your browser and navigate to `http://localhost:8080/SkillHub`.
    
 ### 🔐 Default Credentials
 - **Username:** `admin`
